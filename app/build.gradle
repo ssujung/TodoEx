@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.sujungp.mvvmexample"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    dataBinding {
+        enabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation deps.kotlin.stdlib
+    implementation deps.appcompat
+    implementation deps.core_ktx
+    implementation deps.constraint_layout
+    implementation deps.recyclerview
+    implementation deps.cardview
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.viewmodel
+    implementation deps.lifecycle.livedata
+    implementation deps.lifecycle.runtime
+    implementation deps.legacy
+    implementation deps.room.runtime
+    implementation deps.room.rxjava2
+    implementation deps.rxjava2.rxandroid
+    implementation deps.rxjava2.rxjava
+    implementation deps.rxjava2.rxkotlin
+    implementation deps.navigation.fragment_ktx
+    implementation deps.navigation.ui_ktx
+    implementation deps.coroutines.core
+    implementation deps.coroutines.android
+    implementation deps.koin.scope
+    implementation deps.koin.viewmodel
+    implementation deps.koin.ext
+    implementation deps.retrofit.runtime
+    implementation deps.retrofit.gson
+    implementation deps.retrofit.rxjava2
+    implementation deps.retrofit.mock
+    implementation deps.gson
+    implementation deps.okhttp3_logging_interceptor
+    implementation deps.rxbinding
+    implementation deps.anko.anko
+    implementation deps.anko.commons
+    implementation deps.lottie
+
+    kapt deps.lifecycle.compiler
+    kapt deps.room.compiler
+}
+
+androidExtensions {
+    experimental = true
+}
