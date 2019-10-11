@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding2.view.clicks
 import com.sujungp.todoex.MainActivity
@@ -13,12 +14,11 @@ import com.sujungp.todoex.R
 import com.sujungp.todoex.addtodo.AddTodoFragment
 import com.sujungp.todoex.data.TodoItem
 import com.sujungp.todoex.tododetail.TodoDetailFragment
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_todo_list.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * Created by sujung26 on 2019-08-29.
@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_todo_list.*
 class TodoListFragment : Fragment() {
 
     private lateinit var adapter: TodoListAdapter
+    private val viewModel: TodoListViewModel by viewModel()
 
     private val disposable = CompositeDisposable()
     private val onClickTodoSubject= PublishSubject.create<Pair<View, TodoItem?>>()
@@ -44,18 +45,16 @@ class TodoListFragment : Fragment() {
             (activity as MainActivity).replaceFragment(TodoDetailFragment.newInstance(it.second))
         }.also { disposable.add(it) }
 
-        if (!::adapter.isInitialized) {
-            adapter = TodoListAdapter(onClickTodoSubject)
-        }
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = adapter
-
         addTodo.clicks().subscribeBy {
             (activity as MainActivity).replaceFragment(AddTodoFragment())
         }
 
+        initRecyclerView()
+        observeFromViewModel()
+
+        viewModel.getTodoList()
+
 //        fetchTodoListFromServer()
-        fetchTodoListFromDB()
     }
 
     override fun onDestroyView() {
@@ -63,35 +62,36 @@ class TodoListFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun fetchTodoListFromServer() {
-        val activity = activity as MainActivity
-        activity.api.getTodoList()
-            .subscribeOn(Schedulers.single())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { response ->
-                    response.data?.let { adapter.setList(it) }
-                },
-                onError = { e ->
-                    e.printStackTrace()
+    private fun initRecyclerView() {
+        adapter = TodoListAdapter(onClickTodoSubject)
+            .apply {
+                onClickStatus = {
+                    viewModel.updateTodoStatus()
                 }
-            )
-            .also { disposable.add(it) }
+            }
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = adapter
     }
 
-    private fun fetchTodoListFromDB() {
-        val activity = activity as MainActivity
-        activity.todoDao.getTodoList()
-            .subscribeOn(Schedulers.single())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess =  { itemList ->
-                    itemList?.let { adapter.setList(it) }
-                },
-                onError =  { e ->
-                    e.printStackTrace()
-                }
-            )
-            .also { disposable.add(it) }
+    private fun observeFromViewModel() {
+        viewModel.todoList.observe(viewLifecycleOwner, Observer { itemList ->
+            itemList?.let { adapter.setList(it) }
+        })
+    }
+
+    private fun fetchTodoListFromServer() {
+//        val activity = activity as MainActivity
+//        activity.api.getTodoList()
+//            .subscribeOn(Schedulers.single())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeBy(
+//                onNext = { response ->
+//                    response.data?.let { adapter.setList(it) }
+//                },
+//                onError = { e ->
+//                    e.printStackTrace()
+//                }
+//            )
+//            .also { disposable.add(it) }
     }
 }

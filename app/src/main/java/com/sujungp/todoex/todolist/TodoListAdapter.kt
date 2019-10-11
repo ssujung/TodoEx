@@ -12,8 +12,10 @@ import io.reactivex.subjects.Subject
  */
 class TodoListAdapter(private val onClickTodoSubject: Subject<Pair<View, TodoItem?>>) : BaseRecyclerViewAdapter<TodoItem>() {
 
+    var onClickStatus: ((Boolean) -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<TodoItem> {
-        return TodoItemHolder(parent, onClickTodoSubject)
+        return TodoItemHolder(parent, onClickTodoSubject, onClickStatus)
     }
 
     fun setList(list: List<TodoItem>) {

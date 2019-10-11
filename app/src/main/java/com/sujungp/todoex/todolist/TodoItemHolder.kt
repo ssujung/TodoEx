@@ -11,13 +11,15 @@ import com.sujungp.todoex.data.TodoItem
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.item_todo_list.view.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * Created by sujung26 on 2019-08-29.
  */
 class TodoItemHolder(
     parent: ViewGroup,
-    private val onClickTodoSubject: Subject<Pair<View, TodoItem?>>
+    private val onClickTodoSubject: Subject<Pair<View, TodoItem?>>,
+    private val onClickStatus: ((Boolean) -> Unit)?
 ) : BaseViewHolder<TodoItem>(LayoutInflater.from(parent.context).inflate(R.layout.item_todo_list, parent, false)) {
 
     override fun onBind(item: TodoItem) {
@@ -28,7 +30,11 @@ class TodoItemHolder(
             txtDesc.text = item.todoDesc
             txtDate.text = item.todoTargetDate
             todoStatus.progress = if (item.status) 1f else 0f
-//            setTodoStatus(item.status)
+            todoStatus.onClick {
+                val check = !item.status
+                setTodoStatus(check)
+                onClickStatus?.invoke(check)
+            }
 
             this.clicks()
                 .subscribeBy {

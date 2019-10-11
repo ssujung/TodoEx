@@ -14,15 +14,11 @@ import com.sujungp.todoex.MainActivity
 import com.sujungp.todoex.MainActivity.Companion.TODO_ITEM
 import com.sujungp.todoex.R
 import com.sujungp.todoex.data.TodoItem
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_todo_detail.*
 import kotlinx.android.synthetic.main.item_todo_detail.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.support.v4.toast
 import java.util.*
 
 /**
@@ -88,20 +84,20 @@ class TodoDetailFragment : Fragment() {
 
         val activity = activity as MainActivity
 
-        Completable.fromAction { activity.todoDao.editTodo(todoItem) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    toast("Todo successfully saved")
-                    activity.supportFragmentManager.popBackStack()
-                },
-                onError = { e ->
-                    e.printStackTrace()
-                    toast("Couldn't save Todo, please try again!!")
-                }
-            )
-            .also { disposable.add(it) }
+//        Completable.fromAction { activity.todoDao.editTodo(todoItem) }
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeBy(
+//                onComplete = {
+//                    toast("Todo successfully saved")
+//                    activity.supportFragmentManager.popBackStack()
+//                },
+//                onError = { e ->
+//                    e.printStackTrace()
+//                    toast("Couldn't save Todo, please try again!!")
+//                }
+//            )
+//            .also { disposable.add(it) }
     }
 
     @SuppressLint("SetTextI18n")

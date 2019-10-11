@@ -1,26 +1,21 @@
 package com.sujungp.todoex.addtodo
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.google.gson.Gson
-import com.sujungp.todoex.MainActivity
+import androidx.lifecycle.Observer
 import com.sujungp.todoex.R
 import com.sujungp.todoex.data.TodoItem
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_add_todo.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.longToast
 import org.jetbrains.anko.support.v4.toast
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 /**
@@ -29,6 +24,7 @@ import java.util.*
 class AddTodoFragment : Fragment() {
 
     private val disposable = CompositeDisposable()
+    private val viewModel: AddTodoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_add_todo, container, false)
@@ -61,9 +57,18 @@ class AddTodoFragment : Fragment() {
                     this.todoDesc = desc
                     this.todoTargetDate = date
                 }
-                addTodoToDB(todoItem)
+                viewModel.addTodoItem(todoItem)
             }
         }
+
+        viewModel.addSuccess.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                toast("Todo successfully saved")
+                activity?.supportFragmentManager?.popBackStack()
+            } else {
+                toast("Couldn't save Todo, please try again!!")
+            }
+        })
     }
 
     override fun onDestroyView() {
@@ -72,45 +77,26 @@ class AddTodoFragment : Fragment() {
     }
 
     private fun addTodoToServer(todoItem: TodoItem) {
-        val jsonTodo = Gson().toJson(todoItem)
-        val activity = activity as MainActivity
-
-        activity.api.addTodo(jsonTodo)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { response ->
-                    if (response.errorCode == 0) {
-                        toast("Todo successfully saved")
-                        activity.setResult(Activity.RESULT_OK)
-                        activity.supportFragmentManager.popBackStack()
-                    } else {
-                        toast("Couldn't save Todo, please try again!!")
-                    }
-                },
-                onError = { e ->
-                    e.printStackTrace()
-                }
-            )
-            .also { disposable.add(it) }
-    }
-
-    private fun addTodoToDB(todoItem: TodoItem) {
-        val activity = activity as MainActivity
-
-        Completable.fromAction { activity.todoDao.addTodo(todoItem) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    toast("Todo successfully saved")
-                    activity.supportFragmentManager.popBackStack()
-                },
-                onError = { e ->
-                    e.printStackTrace()
-                    toast("Couldn't save Todo, please try again!!")
-                }
-            )
-            .also { disposable.add(it) }
+//        val jsonTodo = Gson().toJson(todoItem)
+//        val activity = activity as MainActivity
+//
+//        activity.api.addTodo(jsonTodo)
+//            .subscribeOn(Schedulers.newThread())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeBy(
+//                onNext = { response ->
+//                    if (response.errorCode == 0) {
+//                        toast("Todo successfully saved")
+//                        activity.setResult(Activity.RESULT_OK)
+//                        activity.supportFragmentManager.popBackStack()
+//                    } else {
+//                        toast("Couldn't save Todo, please try again!!")
+//                    }
+//                },
+//                onError = { e ->
+//                    e.printStackTrace()
+//                }
+//            )
+//            .also { disposable.add(it) }
     }
 }

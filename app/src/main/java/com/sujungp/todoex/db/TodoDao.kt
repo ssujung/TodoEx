@@ -17,7 +17,10 @@ interface TodoDao {
     fun addTodo(todo: TodoItem?)
 
     @Update
-    fun editTodo(todo: TodoItem?)
+    fun updateTodo(todo: TodoItem?)
+
+//    @Update
+//    fun updateTodoStatus(status: Boolean)
 
     @Delete
     fun deleteTodo(todo: TodoItem?)
