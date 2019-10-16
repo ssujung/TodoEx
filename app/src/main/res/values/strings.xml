@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">TodoEx</string>
+    <string name="app_name">Todo</string>
+    <string name="error_status_update">일시적인 오류가 발생하였습니다. 다시 시도해주세요.</string>
+    <string name="error_load">목록을 불러오는 도중에 일시적인 오류가 발생하였습니다.</string>
+    <string name="success_update">할 일이 성공적으로 업데이트 되었습니다.</string>
 </resources>

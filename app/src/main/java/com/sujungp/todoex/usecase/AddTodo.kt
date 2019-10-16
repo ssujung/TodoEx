@@ -9,6 +9,8 @@ import io.reactivex.Completable
  */
 class AddTodo(private val repository: TodoRepository) : UseCase<TodoItem, Completable> {
     override fun execute(params: TodoItem?): Completable {
-        return repository.addTodoItem(params)
+        return params?.let {
+            repository.addTodoItem(params)
+        } ?: Completable.error(Throwable("AddTodo: parameter must not be null!!"))
     }
 }

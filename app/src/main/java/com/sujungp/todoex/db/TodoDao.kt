@@ -2,6 +2,8 @@ package com.sujungp.todoex.db
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
+import com.sujungp.todoex.TodoStatus
+import com.sujungp.todoex.data.TODO_TABLE_NAME
 import com.sujungp.todoex.data.TodoItem
 import io.reactivex.Single
 
@@ -10,7 +12,7 @@ import io.reactivex.Single
  */
 @Dao
 interface TodoDao {
-    @Query("SELECT * FROM todo")
+    @Query("SELECT * FROM $TODO_TABLE_NAME")
     fun getTodoList(): Single<List<TodoItem>>
 
     @Insert(onConflict = REPLACE)
@@ -19,8 +21,8 @@ interface TodoDao {
     @Update
     fun updateTodo(todo: TodoItem?)
 
-//    @Update
-//    fun updateTodoStatus(status: Boolean)
+    @Query("UPDATE $TODO_TABLE_NAME SET status = :status WHERE id = :id")
+    fun updateTodoStatus(id: Int, status: TodoStatus)
 
     @Delete
     fun deleteTodo(todo: TodoItem?)

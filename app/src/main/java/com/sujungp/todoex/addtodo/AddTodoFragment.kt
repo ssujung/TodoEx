@@ -45,15 +45,17 @@ class AddTodoFragment : Fragment() {
         }
 
         btnAddTodo.onClick {
+            val title = addTodoTitle.text.toString()
             val desc = addTodoDesc.text.toString()
             val date = addTodoDate.text.toString()
 
-            if (desc.isBlank() || date.isBlank()) {
+            if (title.isBlank() || desc.isBlank() || date.isBlank()) {
                 longToast("Todo Description and Date are Mandatory")
             } else {
 //                val todoItem = TodoItem(0, desc, date, status)
 //                addTodoToServer(todoItem)
                 val todoItem = TodoItem().apply {
+                    this.todoTitle = title
                     this.todoDesc = desc
                     this.todoTargetDate = date
                 }

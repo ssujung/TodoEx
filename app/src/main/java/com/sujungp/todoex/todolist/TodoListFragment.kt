@@ -13,11 +13,15 @@ import com.sujungp.todoex.MainActivity
 import com.sujungp.todoex.R
 import com.sujungp.todoex.addtodo.AddTodoFragment
 import com.sujungp.todoex.data.TodoItem
+import com.sujungp.todoex.isCompleted
+import com.sujungp.todoex.setStatus
 import com.sujungp.todoex.tododetail.TodoDetailFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_todo_list.*
+import kotlinx.android.synthetic.main.item_todo_list.view.*
+import org.jetbrains.anko.support.v4.toast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -66,7 +70,7 @@ class TodoListFragment : Fragment() {
         adapter = TodoListAdapter(onClickTodoSubject)
             .apply {
                 onClickStatus = {
-                    viewModel.updateTodoStatus()
+                    viewModel.updateTodoStatus(it)
                 }
             }
         recyclerView.layoutManager = LinearLayoutManager(activity)
@@ -75,7 +79,27 @@ class TodoListFragment : Fragment() {
 
     private fun observeFromViewModel() {
         viewModel.todoList.observe(viewLifecycleOwner, Observer { itemList ->
-            itemList?.let { adapter.setList(it) }
+            itemList?.let {
+                adapter.setList(it)
+            } ?: run {
+                toast(R.string.error_load)
+            }
+        })
+
+        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
+            val id = it.first
+            val isSuccess = it.second
+            val status = it.third
+
+            if (isSuccess) {
+                adapter.items.find { item -> item.id == id }?.todoStatus = status
+            } else {
+                val holder = recyclerView.findViewHolderForAdapterPosition(id - 1)
+                if (holder is TodoItemHolder) {
+                    holder.itemView.todoStatus.setStatus(status.isCompleted(), needAnimation = true)
+                }
+                toast(R.string.error_status_update)
+            }
         })
     }
 

@@ -1,5 +1,6 @@
 package com.sujungp.todoex.data
 
+import com.sujungp.todoex.TodoStatus
 import com.sujungp.todoex.db.TodoDao
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -18,8 +19,12 @@ class TodoRepositoryImpl(
         return Completable.fromAction { dbDao.addTodo(todoItem) }
     }
 
-    override fun updateTodoStatus(status: Boolean): Completable {
-        return Completable.fromAction { /*dbDao.updateTodoStatus(status) */}
+    override fun updateTodoItem(todoItem: TodoItem?): Completable {
+        return Completable.fromAction { dbDao.updateTodo(todoItem) }
+    }
+
+    override fun updateTodoStatus(id: Int, status: TodoStatus): Completable {
+        return Completable.fromAction { dbDao.updateTodoStatus(id, status) }
     }
 
     override fun removeTodoItem(todoItem: TodoItem?): Completable {

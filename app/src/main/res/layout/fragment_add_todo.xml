@@ -9,11 +9,22 @@
               android:gravity="center">
 
     <EditText
+            android:id="@+id/addTodoTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:hint="Todo Title"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black_alpha_60"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+    <EditText
         android:id="@+id/addTodoDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:hint="Todo Description"
+        android:layout_marginTop="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/black_alpha_60"
         android:textAppearance="?android:textAppearanceMedium"/>

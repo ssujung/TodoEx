@@ -9,16 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.jakewharton.rxbinding2.view.clicks
-import com.sujungp.todoex.MainActivity
+import com.sujungp.todoex.*
 import com.sujungp.todoex.MainActivity.Companion.TODO_ITEM
-import com.sujungp.todoex.R
 import com.sujungp.todoex.data.TodoItem
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_todo_detail.*
 import kotlinx.android.synthetic.main.item_todo_detail.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.support.v4.toast
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 /**
@@ -26,6 +28,7 @@ import java.util.*
  */
 class TodoDetailFragment : Fragment() {
 
+    private val viewModel: TodoDetailViewModel by viewModel()
     private val disposable = CompositeDisposable()
     private var todoItem: TodoItem? = null
     private var isEditing = false
@@ -57,7 +60,8 @@ class TodoDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setData(todoItem)
+        setData()
+        observeFromViewModel()
 
         fabEditTodo.clicks().subscribeBy {
             if (isEditing) {
@@ -68,54 +72,56 @@ class TodoDetailFragment : Fragment() {
         }.also { disposable.add(it) }
     }
 
-    private fun setData(item: TodoItem?) {
-        item?.let {
-            txtID.text = it.id.toString()
-            txtDesc.setText(it.todoDesc)
-            txtDate.text = it.todoTargetDate
-            todoStatus.progress = if (it.status) 1f else 0f
+    private fun setData() {
+        todoItem?.let {
+            todoTitle.setText(it.todoTitle)
+            todoDesc.setText(it.todoDesc)
+            todoDate.text = it.todoTargetDate
+            todoStatus.setStatus(it.todoStatus.isCompleted(), needAnimation = false)
         }
     }
 
+    private fun observeFromViewModel() {
+        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                toast(R.string.success_update)
+                activity?.supportFragmentManager?.popBackStack()
+            } else {
+                toast(R.string.error_status_update)
+            }
+        })
+    }
+
     private fun saveTodoToDB() {
-        todoItem?.todoDesc = txtDesc.text.toString()
-        todoItem?.status = todoStatus.progress == 1f
-        todoItem?.todoTargetDate = txtDate.text.toString()
-
-        val activity = activity as MainActivity
-
-//        Completable.fromAction { activity.todoDao.editTodo(todoItem) }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribeBy(
-//                onComplete = {
-//                    toast("Todo successfully saved")
-//                    activity.supportFragmentManager.popBackStack()
-//                },
-//                onError = { e ->
-//                    e.printStackTrace()
-//                    toast("Couldn't save Todo, please try again!!")
-//                }
-//            )
-//            .also { disposable.add(it) }
+        val item = TodoItem(
+            todoItem?.id ?: 1,
+            todoTitle.text.toString(),
+            todoDesc.text.toString(),
+            todoDate.text.toString(),
+            todoStatus.getStatus()
+        )
+        viewModel.updateTodo(item)
     }
 
     @SuppressLint("SetTextI18n")
     private fun startEdit() {
         isEditing = true
-        txtDesc.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_CLASS_TEXT
+        todoTitle.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_CLASS_TEXT
+        todoDesc.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_CLASS_TEXT
 
-        txtDate.onClick {
+        todoDate.onClick {
             val calendar = Calendar.getInstance()
             val dp = DatePickerDialog(activity,
                 DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                    txtDate.text = "$year/${month + 1}/$dayOfMonth"
-                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                    todoDate.text = "$year/${month + 1}/$dayOfMonth"
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
+            )
             dp.datePicker.minDate = calendar.timeInMillis
             dp.show()
         }
 
-        txtDesc.requestFocus()
+        todoTitle.requestFocus()
+        todoDesc.requestFocus()
 
         fabEditTodo.setImageDrawable(ContextCompat.getDrawable(activity!!, R.drawable.ic_save))
     }

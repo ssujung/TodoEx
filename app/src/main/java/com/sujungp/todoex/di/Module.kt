@@ -8,9 +8,12 @@ import com.sujungp.todoex.api.RetrofitBuilder
 import com.sujungp.todoex.data.TodoRepository
 import com.sujungp.todoex.data.TodoRepositoryImpl
 import com.sujungp.todoex.db.TodoDB
+import com.sujungp.todoex.tododetail.TodoDetailViewModel
 import com.sujungp.todoex.todolist.TodoListViewModel
 import com.sujungp.todoex.usecase.AddTodo
 import com.sujungp.todoex.usecase.GetTodoList
+import com.sujungp.todoex.usecase.UpdateTodo
+import com.sujungp.todoex.usecase.UpdateTodoStatus
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -37,10 +40,13 @@ val todoModule = module {
     // Usecase
     factory { GetTodoList(get()) }
     factory { AddTodo(get()) }
+    factory { UpdateTodo(get()) }
+    factory { UpdateTodoStatus(get()) }
 
     // ViewModel
-    viewModel { TodoListViewModel(get()) }
+    viewModel { TodoListViewModel(get(), get()) }
     viewModel { AddTodoViewModel(get()) }
+    viewModel { TodoDetailViewModel(get()) }
 }
 
 val appModule= listOf(networkModule, dbModule, todoModule)

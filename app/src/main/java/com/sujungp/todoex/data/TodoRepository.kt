@@ -1,5 +1,6 @@
 package com.sujungp.todoex.data
 
+import com.sujungp.todoex.TodoStatus
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -9,6 +10,7 @@ import io.reactivex.Single
 interface TodoRepository {
     fun getTodoList(): Single<List<TodoItem>>
     fun addTodoItem(todoItem: TodoItem?): Completable
-    fun updateTodoStatus(status: Boolean = false): Completable
+    fun updateTodoItem(todoItem: TodoItem?): Completable
+    fun updateTodoStatus(id: Int, status: TodoStatus): Completable
     fun removeTodoItem(todoItem: TodoItem?): Completable
 }
