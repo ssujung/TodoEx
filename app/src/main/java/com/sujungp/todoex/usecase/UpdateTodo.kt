@@ -7,8 +7,10 @@ import io.reactivex.Completable
 /**
  * Created by sujung26 on 2019-10-15.
  */
-class UpdateTodo(val repository: TodoRepository) : UseCase<TodoItem, Completable> {
+class UpdateTodo(private val repository: TodoRepository) : UseCase<TodoItem, Completable> {
     override fun execute(params: TodoItem?): Completable {
-        return repository.updateTodoItem(params)
+        return params?.let {
+            repository.updateTodoItem(it)
+        } ?: Completable.error(Throwable("UpdateTodo: parameter must not be null!!"))
     }
 }
