@@ -14,7 +14,7 @@ data class TodoItem(
 
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "id")
-        var id: Int?,
+        var id: Int,
 
         @ColumnInfo(name = "title")
         var todoTitle: String?,

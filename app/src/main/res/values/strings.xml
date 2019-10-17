@@ -3,4 +3,10 @@
     <string name="error_status_update">일시적인 오류가 발생하였습니다. 다시 시도해주세요.</string>
     <string name="error_load">목록을 불러오는 도중에 일시적인 오류가 발생하였습니다.</string>
     <string name="success_update">할 일이 성공적으로 업데이트 되었습니다.</string>
+    <string name="success_add">할 일이 성공적으로 저장되었습니다.</string>
+    <string name="error_add">추가하는데 오류가 생겼습니다. 다시 시도해주세요.</string>
+    <string name="add_no_mandatory">빈 칸 다 입력해주세요.</string>
+    <string name="success_remove">할 일이 성공적으로 삭제되었습니다.</string>
+    <string name="error_remove">삭제하는데 오류가 생겼습니다.</string>
+    <string name="empty_list">등록된 할 일이 없습니다.</string>
 </resources>

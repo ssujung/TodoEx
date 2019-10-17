@@ -36,7 +36,7 @@ class TodoItemHolder(
             todoStatus.onClick {
                 val check = item.todoStatus.reverse()
                 todoStatus.setStatusView(check, needAnimation = true)
-                onClickStatus?.invoke(Pair(item.id ?: 1, check))
+                onClickStatus?.invoke(Pair(item.id, check))
             }
 
             this.clicks()

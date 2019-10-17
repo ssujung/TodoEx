@@ -26,6 +26,11 @@ class TodoListAdapter(private val onClickTodoSubject: Subject<Pair<View, TodoIte
         notifyDataSetChanged()
     }
 
+    fun remove(position: Int) {
+        removeItem(position)
+        notifyDataSetChanged()
+    }
+
     companion object {
         const val VIEW_TYPE_TODO = 0
     }

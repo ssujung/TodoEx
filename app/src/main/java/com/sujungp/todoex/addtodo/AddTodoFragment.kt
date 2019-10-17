@@ -50,7 +50,7 @@ class AddTodoFragment : Fragment() {
             val date = addTodoDate.text.toString()
 
             if (title.isBlank() || desc.isBlank() || date.isBlank()) {
-                longToast("Todo Description and Date are Mandatory")
+                longToast(R.string.add_no_mandatory)
             } else {
 //                val todoItem = TodoItem(0, desc, date, status)
 //                addTodoToServer(todoItem)
@@ -65,10 +65,10 @@ class AddTodoFragment : Fragment() {
 
         viewModel.addSuccess.observe(viewLifecycleOwner, Observer {
             if (it) {
-                toast("Todo successfully saved")
+                toast(R.string.success_add)
                 activity?.supportFragmentManager?.popBackStack()
             } else {
-                toast("Couldn't save Todo, please try again!!")
+                toast(R.string.error_add)
             }
         })
     }

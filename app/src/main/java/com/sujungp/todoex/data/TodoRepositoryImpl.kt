@@ -28,6 +28,6 @@ class TodoRepositoryImpl(
     }
 
     override fun removeTodoItem(todoItem: TodoItem?): Completable {
-        return Completable.fromAction { }
+        return Completable.fromAction { dbDao.deleteTodo(todoItem) }
     }
 }

@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.rxbinding2.view.clicks
 import com.sujungp.todoex.MainActivity
 import com.sujungp.todoex.R
@@ -74,12 +76,42 @@ class TodoListFragment : Fragment() {
             }
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = adapter
+
+        // swipe to delete item
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val item = adapter.items[position]
+                adapter.remove(position)
+                viewModel.removeTodoItem(item)
+                showTextIfEmptyList(adapter.itemCount < 1)
+            }
+        }).apply {
+            attachToRecyclerView(recyclerView)
+        }
+    }
+
+    private fun showTextIfEmptyList(isEmptyList: Boolean) {
+        if (isEmptyList) {
+            emptyListTv.visibility = View.VISIBLE
+        } else {
+            emptyListTv.visibility = View.INVISIBLE
+        }
     }
 
     private fun observeFromViewModel() {
         viewModel.todoList.observe(viewLifecycleOwner, Observer { itemList ->
             itemList?.let {
                 adapter.setList(it)
+                showTextIfEmptyList(adapter.itemCount < 1)
             } ?: run {
                 toast(R.string.error_load)
             }
@@ -98,6 +130,14 @@ class TodoListFragment : Fragment() {
                     holder.itemView.todoStatus.setStatusView(status, needAnimation = true)
                 }
                 toast(R.string.error_status_update)
+            }
+        })
+
+        viewModel.removeResult.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                toast(R.string.success_remove)
+            } else {
+                toast(R.string.error_remove)
             }
         })
     }

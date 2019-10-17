@@ -31,6 +31,15 @@
             android:orientation="vertical"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
 
+    <TextView
+            android:id="@+id/emptyListTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:visibility="invisible"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addTodo"
             android:layout_width="wrap_content"
