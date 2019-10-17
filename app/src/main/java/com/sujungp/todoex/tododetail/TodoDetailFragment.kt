@@ -77,7 +77,7 @@ class TodoDetailFragment : Fragment() {
             todoTitle.setText(it.todoTitle)
             todoDesc.setText(it.todoDesc)
             todoDate.text = it.todoTargetDate
-            todoStatus.setStatus(it.todoStatus.isCompleted(), needAnimation = false)
+            todoStatus.setStatusView(it.todoStatus, needAnimation = false)
         }
     }
 
@@ -98,7 +98,7 @@ class TodoDetailFragment : Fragment() {
             todoTitle.text.toString(),
             todoDesc.text.toString(),
             todoDate.text.toString(),
-            todoStatus.getStatus()
+            todoItem?.todoStatus ?: TodoStatus.ACTIVE
         )
         viewModel.updateTodo(item)
     }
@@ -108,6 +108,11 @@ class TodoDetailFragment : Fragment() {
         isEditing = true
         todoTitle.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_CLASS_TEXT
         todoDesc.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE or InputType.TYPE_CLASS_TEXT
+
+        todoStatus.onClick {
+            todoItem?.todoStatus = todoItem?.todoStatus?.reverse()
+            todoStatus.setStatusView(todoItem?.todoStatus, needAnimation = true)
+        }
 
         todoDate.onClick {
             val calendar = Calendar.getInstance()
@@ -120,8 +125,14 @@ class TodoDetailFragment : Fragment() {
             dp.show()
         }
 
-        todoTitle.requestFocus()
-        todoDesc.requestFocus()
+        todoTitle.run {
+            isFocusableInTouchMode = true
+            requestFocus()
+        }
+        todoDesc.run {
+            isFocusableInTouchMode = true
+            requestFocus()
+        }
 
         fabEditTodo.setImageDrawable(ContextCompat.getDrawable(activity!!, R.drawable.ic_save))
     }

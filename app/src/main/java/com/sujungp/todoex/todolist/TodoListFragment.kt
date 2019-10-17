@@ -13,8 +13,7 @@ import com.sujungp.todoex.MainActivity
 import com.sujungp.todoex.R
 import com.sujungp.todoex.addtodo.AddTodoFragment
 import com.sujungp.todoex.data.TodoItem
-import com.sujungp.todoex.isCompleted
-import com.sujungp.todoex.setStatus
+import com.sujungp.todoex.setStatusView
 import com.sujungp.todoex.tododetail.TodoDetailFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -96,7 +95,7 @@ class TodoListFragment : Fragment() {
             } else {
                 val holder = recyclerView.findViewHolderForAdapterPosition(id - 1)
                 if (holder is TodoItemHolder) {
-                    holder.itemView.todoStatus.setStatus(status.isCompleted(), needAnimation = true)
+                    holder.itemView.todoStatus.setStatusView(status, needAnimation = true)
                 }
                 toast(R.string.error_status_update)
             }

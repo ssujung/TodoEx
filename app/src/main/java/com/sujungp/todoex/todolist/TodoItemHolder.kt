@@ -4,9 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.jakewharton.rxbinding2.view.clicks
-import com.sujungp.todoex.*
+import com.sujungp.todoex.R
+import com.sujungp.todoex.TodoStatus
 import com.sujungp.todoex.base.BaseViewHolder
 import com.sujungp.todoex.data.TodoItem
+import com.sujungp.todoex.reverse
+import com.sujungp.todoex.setStatusView
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.item_todo_list.view.*
@@ -28,12 +31,12 @@ class TodoItemHolder(
             todoTitle.text = item.todoTitle
             todoDesc.text = item.todoDesc
             todoDate.text = item.todoTargetDate
-            todoStatus.setStatus(item.todoStatus.isCompleted(), needAnimation = false)
+            todoStatus.setStatusView(item.todoStatus, needAnimation = false)
 
             todoStatus.onClick {
                 val check = item.todoStatus.reverse()
-                todoStatus.setStatus(check.isCompleted(), needAnimation = true)
-                onClickStatus?.invoke(Pair(item.id, check))
+                todoStatus.setStatusView(check, needAnimation = true)
+                onClickStatus?.invoke(Pair(item.id ?: 1, check))
             }
 
             this.clicks()

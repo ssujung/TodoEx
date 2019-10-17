@@ -14,19 +14,19 @@ data class TodoItem(
 
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "id")
-        var id: Int,
+        var id: Int?,
 
         @ColumnInfo(name = "title")
-        var todoTitle: String,
+        var todoTitle: String?,
 
         @ColumnInfo(name = "desc")
-        var todoDesc: String,
+        var todoDesc: String?,
 
         @ColumnInfo(name = "date")
-        var todoTargetDate: String,
+        var todoTargetDate: String?,
 
         @ColumnInfo(name = "status")
-        var todoStatus: TodoStatus
+        var todoStatus: TodoStatus?
 
 ): Serializable {
         constructor(): this(0, "", "", "", TodoStatus.ACTIVE)
