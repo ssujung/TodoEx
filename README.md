@@ -1,2 +1,2 @@
 # Todo App
-Use MVVM + Koin + Room + Retrofit
+Use MVVM & AAC + Koin + Room + Retrofit
