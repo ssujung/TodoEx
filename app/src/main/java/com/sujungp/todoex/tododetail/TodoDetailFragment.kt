@@ -36,7 +36,7 @@ class TodoDetailFragment : Fragment() {
     companion object {
         fun newInstance(todoItem: TodoItem?): TodoDetailFragment {
             val args = Bundle().apply {
-                putSerializable(TODO_ITEM, todoItem)
+                putParcelable(TODO_ITEM, todoItem)
             }
             return TodoDetailFragment().apply {
                 arguments = args
@@ -48,7 +48,7 @@ class TodoDetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            todoItem = it.getSerializable(TODO_ITEM) as? TodoItem
+            todoItem = it.getParcelable(TODO_ITEM) as? TodoItem
         }
     }
 

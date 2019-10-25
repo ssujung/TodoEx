@@ -1,18 +1,19 @@
 package com.sujungp.todoex.base
 
-import android.view.View
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
+import com.sujungp.todoex.BR
 
 /**
  * Created by sujung26 on 2019-08-29.
  */
-open class BaseViewHolder<T>(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+abstract class BaseViewHolder<T>(
+    private val binding: ViewDataBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
-    protected var item: T? = null
-
-    open fun onBind(item: T) {
-        this.item = item
+    open fun bind(item: T?) {
+        binding.setVariable(BR.item, item)
+        binding.executePendingBindings()
     }
 
     open fun onRecycled() {}

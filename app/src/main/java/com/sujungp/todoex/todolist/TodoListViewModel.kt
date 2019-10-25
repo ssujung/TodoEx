@@ -29,9 +29,9 @@ class TodoListViewModel(
     val todoList: LiveData<List<TodoItem>>
         get() = _todoList
 
-    private var _updateResult: MutableLiveData<Triple<Int, Boolean, TodoStatus>> = MutableLiveData()
-    val updateResult: LiveData<Triple<Int, Boolean, TodoStatus>>
-        get() = _updateResult
+    private var _updateStatus: MutableLiveData<TodoItem> = MutableLiveData()
+    val updateItem: LiveData<TodoItem>
+        get() = _updateStatus
 
     private var _removeResult: MutableLiveData<Boolean> = MutableLiveData()
     val removeResult: LiveData<Boolean>
@@ -54,16 +54,18 @@ class TodoListViewModel(
             ).also { disposable.add(it) }
     }
 
-    fun updateTodoStatus(pair: Pair<Int, TodoStatus>) {
-        updateStatus.execute(pair)
+    fun updateTodoStatus(id: Int, oldStatus: TodoStatus) {
+        val newStatus = oldStatus.reverse()
+        this.updateStatus.execute(Pair(id, newStatus))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    _updateResult.value = Triple(pair.first, true, pair.second)
+                    val item: TodoItem?  = _todoList.value?.find { it.id == id }
+                    item?.todoStatus = newStatus
+                    _updateStatus.value = item
                 },
                 onError = { e ->
-                    _updateResult.value = Triple(pair.first, false, pair.second.reverse())
                     e.printStackTrace()
                 }
             ).also { disposable.add(it) }

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,14 +15,12 @@ import com.sujungp.todoex.MainActivity
 import com.sujungp.todoex.R
 import com.sujungp.todoex.addtodo.AddTodoFragment
 import com.sujungp.todoex.data.TodoItem
-import com.sujungp.todoex.setStatusView
+import com.sujungp.todoex.databinding.FragmentTodoListBinding
 import com.sujungp.todoex.tododetail.TodoDetailFragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_todo_list.*
-import kotlinx.android.synthetic.main.item_todo_list.view.*
-import org.jetbrains.anko.support.v4.toast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -30,14 +28,21 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class TodoListFragment : Fragment() {
 
+    private val vm: TodoListViewModel by viewModel()
     private lateinit var adapter: TodoListAdapter
-    private val viewModel: TodoListViewModel by viewModel()
+    private lateinit var binding: FragmentTodoListBinding
 
     private val disposable = CompositeDisposable()
     private val onClickTodoSubject= PublishSubject.create<Pair<View, TodoItem?>>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_todo_list, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_todo_list, container, false)
+        binding.apply {
+            this.viewModel = vm
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        return binding.root
     }
 
     @SuppressLint("CheckResult")
@@ -55,9 +60,7 @@ class TodoListFragment : Fragment() {
         }
 
         initRecyclerView()
-        observeFromViewModel()
-
-        viewModel.getTodoList()
+        binding.viewModel?.getTodoList()
 
 //        fetchTodoListFromServer()
     }
@@ -68,14 +71,9 @@ class TodoListFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        adapter = TodoListAdapter(onClickTodoSubject)
-            .apply {
-                onClickStatus = {
-                    viewModel.updateTodoStatus(it)
-                }
-            }
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = adapter
+        adapter = TodoListAdapter(vm, onClickTodoSubject)
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.adapter = adapter
 
         // swipe to delete item
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -91,11 +89,11 @@ class TodoListFragment : Fragment() {
                 val position = viewHolder.adapterPosition
                 val item = adapter.items[position]
                 adapter.remove(position)
-                viewModel.removeTodoItem(item)
+                binding.viewModel?.removeTodoItem(item)
                 showTextIfEmptyList(adapter.itemCount < 1)
             }
         }).apply {
-            attachToRecyclerView(recyclerView)
+            attachToRecyclerView(binding.recyclerView)
         }
     }
 
@@ -108,38 +106,29 @@ class TodoListFragment : Fragment() {
     }
 
     private fun observeFromViewModel() {
-        viewModel.todoList.observe(viewLifecycleOwner, Observer { itemList ->
-            itemList?.let {
-                adapter.setList(it)
-                showTextIfEmptyList(adapter.itemCount < 1)
-            } ?: run {
-                toast(R.string.error_load)
-            }
-        })
-
-        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
-            val id = it.first
-            val isSuccess = it.second
-            val status = it.third
-
-            if (isSuccess) {
-                adapter.items.find { item -> item.id == id }?.todoStatus = status
-            } else {
-                val holder = recyclerView.findViewHolderForAdapterPosition(id - 1)
-                if (holder is TodoItemHolder) {
-                    holder.itemView.todoStatus.setStatusView(status, needAnimation = true)
-                }
-                toast(R.string.error_status_update)
-            }
-        })
-
-        viewModel.removeResult.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                toast(R.string.success_remove)
-            } else {
-                toast(R.string.error_remove)
-            }
-        })
+//        viewModel.updateResult.observe(viewLifecycleOwner, Observer {
+//            val id = it.first
+//            val isSuccess = it.second
+//            val status = it.third
+//
+//            if (isSuccess) {
+//                adapter.items.find { item -> item.id == id }?.todoStatus = status
+//            } else {
+//                val holder = recyclerView.findViewHolderForAdapterPosition(id - 1)
+//                if (holder is TodoItemHolder) {
+//                    holder.itemView.todoStatus.setStatusView(status, needAnimation = true)
+//                }
+//                toast(R.string.error_status_update)
+//            }
+//        })
+//
+//        viewModel.removeResult.observe(viewLifecycleOwner, Observer {
+//            if (it) {
+//                toast(R.string.success_remove)
+//            } else {
+//                toast(R.string.error_remove)
+//            }
+//        })
     }
 
     private fun fetchTodoListFromServer() {

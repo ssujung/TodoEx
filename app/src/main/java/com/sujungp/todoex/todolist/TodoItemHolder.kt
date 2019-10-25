@@ -1,48 +1,38 @@
 package com.sujungp.todoex.todolist
 
-import android.view.LayoutInflater
+import android.annotation.SuppressLint
 import android.view.View
-import android.view.ViewGroup
+import androidx.databinding.BindingAdapter
+import com.airbnb.lottie.LottieAnimationView
 import com.jakewharton.rxbinding2.view.clicks
-import com.sujungp.todoex.R
 import com.sujungp.todoex.TodoStatus
 import com.sujungp.todoex.base.BaseViewHolder
 import com.sujungp.todoex.data.TodoItem
-import com.sujungp.todoex.reverse
+import com.sujungp.todoex.databinding.ItemTodoListBinding
 import com.sujungp.todoex.setStatusView
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.Subject
-import kotlinx.android.synthetic.main.item_todo_list.view.*
-import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * Created by sujung26 on 2019-08-29.
  */
 class TodoItemHolder(
-    parent: ViewGroup,
-    private val onClickTodoSubject: Subject<Pair<View, TodoItem?>>,
-    private val onClickStatus: ((Pair<Int, TodoStatus>) -> Unit)?
-) : BaseViewHolder<TodoItem>(LayoutInflater.from(parent.context).inflate(R.layout.item_todo_list, parent, false)) {
+    binding: ItemTodoListBinding,
+    private val onClickTodoSubject: Subject<Pair<View, TodoItem?>>
+) : BaseViewHolder<TodoItem>(binding) {
 
-    override fun onBind(item: TodoItem) {
-        super.onBind(item)
+    @SuppressLint("CheckResult")
+    override fun bind(item: TodoItem?) {
+        super.bind(item)
 
-        with(itemView) {
-            todoTitle.text = item.todoTitle
-            todoDesc.text = item.todoDesc
-            todoDate.text = item.todoTargetDate
-            todoStatus.setStatusView(item.todoStatus, needAnimation = false)
-
-            todoStatus.onClick {
-                val check = item.todoStatus.reverse()
-                todoStatus.setStatusView(check, needAnimation = true)
-                onClickStatus?.invoke(Pair(item.id, check))
+        itemView.clicks()
+            .subscribeBy {
+                onClickTodoSubject.onNext(Pair(itemView, item))
             }
-
-            this.clicks()
-                .subscribeBy {
-                    onClickTodoSubject.onNext(Pair(this, item))
-                }
-        }
     }
+}
+
+@BindingAdapter("setStatus")
+fun setStatus(view: LottieAnimationView, todoStatus: TodoStatus?) {
+    view.setStatusView(todoStatus, false)
 }

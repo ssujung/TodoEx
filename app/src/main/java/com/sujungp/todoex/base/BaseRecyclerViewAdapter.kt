@@ -1,18 +1,21 @@
 package com.sujungp.todoex.base
 
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 
 /**
  * Created by sujung26 on 2019-08-29.
  */
-abstract class BaseRecyclerViewAdapter<T> : RecyclerView.Adapter<BaseViewHolder<T>>() {
+abstract class BaseRecyclerViewAdapter<T>(
+    diffCallback: DiffUtil.ItemCallback<T>
+) : ListAdapter<T, BaseViewHolder<T>>(diffCallback) {
 
     private var items: MutableList<BaseItem<T>> = mutableListOf()
     protected val rawItems: List<BaseItem<T>>
         get() = items
 
     override fun onBindViewHolder(holder: BaseViewHolder<T>, position: Int) {
-        holder.onBind(items[position].data)
+        holder.bind(items[position].data)
     }
 
     override fun getItemCount(): Int = items.size
@@ -22,7 +25,7 @@ abstract class BaseRecyclerViewAdapter<T> : RecyclerView.Adapter<BaseViewHolder<
         holder.onRecycled()
     }
 
-    protected fun setItemList(list: List<T>, viewType: Int = 0) {
+    protected fun setItemList(list: List<T>?, viewType: Int = 0) {
         removeAll()
         items.addAll(map(list, viewType))
     }
@@ -49,15 +52,20 @@ abstract class BaseRecyclerViewAdapter<T> : RecyclerView.Adapter<BaseViewHolder<
         items.clear()
     }
 
-    protected fun modifyItem(item: BaseItem<T>, position: Int) {
+    protected fun updateItem(item: BaseItem<T>, position: Int) {
         items[position] = item
     }
 
-    protected fun map(list: List<T>, viewType: Int): List<BaseItem<T>> {
-        return list.map { mapToBaseItem(it, viewType) }
+    protected fun updateItem(item: BaseItem<T>) {
+        val position = items.indexOfFirst { it == item }
+        updateItem(item, position)
     }
 
-    protected fun mapToBaseItem(item: T, viewType: Int): BaseItem<T> {
+    protected fun map(list: List<T>?, viewType: Int): List<BaseItem<T>> {
+        return list?.map { mapToBaseItem(it, viewType) } ?: listOf()
+    }
+
+    protected fun mapToBaseItem(item: T?, viewType: Int): BaseItem<T> {
         return BaseItem(item, viewType)
     }
 }
