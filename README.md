@@ -1,2 +1,2 @@
 # Todo App
-Use MVVM & AAC + Koin + Room + Retrofit
+Use MVVM(No DataBinding) & AAC + Koin + Room + Retrofit
